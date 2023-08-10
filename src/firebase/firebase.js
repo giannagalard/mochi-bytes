@@ -88,7 +88,7 @@ export async function searchData(search) {
     let data = []
     try {
         const collectionRef = collection(db, "recipes");
-        const q = query(collectionRef, where("data.name_lower", ">=", search.toLowerCase()), where("data.name_lower", "<=", search.toLowerCase() + '~'))
+        const q = query(collectionRef, where("data.category", "array-contains-any", [search]))
         const querySnapshot = await getDocs(q);
         querySnapshot.forEach((doc) => {
             // doc.data() is never undefined for query doc snapshots

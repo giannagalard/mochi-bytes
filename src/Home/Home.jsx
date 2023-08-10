@@ -2,9 +2,10 @@ import React, { useState, useEffect } from "react";
 import { Typography, Box } from "@mui/material";
 import { fetchRecipes } from "../firebase/firebase";
 import { Loading } from "../components";
-import RecipesCards from "../components/RecipesCards";
+import { MemoizedRecipesCards } from "../components";
+import { Link } from "react-router-dom";
 
-export default function Home() {
+function Home() {
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -23,18 +24,27 @@ export default function Home() {
   return loading ? (
     <Loading />
   ) : (
-    <Box padding={4}>
+    <Box padding={3}>
       <Typography
+        component={Link}
+        to="/recipes"
         sx={{
           textDecoration: "underline",
-          textDecorationColor: "#D5BDAF",
-          mb: "15px",
+          textDecorationColor: "#FF335C",
+          mb: 5,
+          fontFamily: "'Acme', sans-serif",
+          color: "#FF7892",
+          "&:hover": {
+            color: "#FF335C",
+          },
         }}
         variant="h3"
       >
-        Latest Recipes
+        Latest Recipes {">"}
       </Typography>
-      <RecipesCards recipes={recipes} />
+      <MemoizedRecipesCards recipes={recipes.slice(0, 5)} page="home" />
     </Box>
   );
 }
+
+export default React.memo(Home);

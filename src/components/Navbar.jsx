@@ -3,20 +3,20 @@ import { styled, alpha } from "@mui/material/styles";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
-import Typography from "@mui/material/Typography";
 import InputBase from "@mui/material/InputBase";
-import MenuIcon from "@mui/icons-material/Menu";
 import SearchIcon from "@mui/icons-material/Search";
 import { searchData } from "../firebase/firebase";
 import { Link, useNavigate } from "react-router-dom";
+import { Avatar } from "@mui/material";
+import logo from "../Assets/logo.png";
+import { Menu } from ".";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
   borderRadius: theme.shape.borderRadius,
-  backgroundColor: alpha(theme.palette.common.white, 0.15),
+  backgroundColor: alpha("#FF7892", 0.6),
   "&:hover": {
-    backgroundColor: alpha(theme.palette.common.white, 0.25),
+    backgroundColor: alpha("#FF7892", 0.8),
   },
   marginLeft: 0,
   width: "100%",
@@ -40,7 +40,6 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   color: "inherit",
   "& .MuiInputBase-input": {
     padding: theme.spacing(1, 1, 1, 0),
-    // vertical padding + font size from searchIcon
     paddingLeft: `calc(1em + ${theme.spacing(4)})`,
     transition: theme.transitions.create("width"),
     width: "100%",
@@ -72,42 +71,39 @@ export default function Navbar() {
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar sx={{ background: "#c9ada7" }} position="static">
+      <AppBar sx={{ background: "#FFDAE1" }} position="static">
         <Toolbar>
-          <IconButton
-            size="large"
-            edge="start"
-            color="inherit"
-            aria-label="open drawer"
-            sx={{ mr: 2 }}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography
-            variant="h6"
-            noWrap
-            component={Link}
-            to="/home"
+          <Box
             sx={{
               flexGrow: 1,
-              display: { xs: "none", sm: "block" },
-              textDecoration: "none",
-              color: "white",
+              display: { xs: "none", sm: "flex" },
             }}
           >
-            MochiBytes
-          </Typography>
-          <Search>
-            <SearchIconWrapper>
-              <SearchIcon />
-            </SearchIconWrapper>
-            <StyledInputBase
-              onKeyDown={onSearch}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search…"
-              inputProps={{ "aria-label": "search" }}
+            <Avatar
+              component={Link}
+              to="/home"
+              src={logo}
+              variant="rounded"
+              sx={{
+                width: { sm: "270px", md: "250px", lg: "300px" },
+                height: { sm: "60px", md: "60px", lg: "60px" },
+              }}
             />
-          </Search>
+          </Box>
+          <Box sx={{ display: "flex", justifyContent: "center", gap: "10px" }}>
+            <Menu text="Recipes" />
+            <Search>
+              <SearchIconWrapper>
+                <SearchIcon />
+              </SearchIconWrapper>
+              <StyledInputBase
+                onKeyDown={onSearch}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search…"
+                inputProps={{ "aria-label": "search" }}
+              />
+            </Search>
+          </Box>
         </Toolbar>
       </AppBar>
     </Box>
