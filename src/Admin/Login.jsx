@@ -37,10 +37,10 @@ export default function Login() {
   useEffect(() => {
     let isMounted = true;
     onAuthStateChanged(auth, (user) => {
-      if (user) {
+      if (!user) {
         if (isMounted) {
           setLoading(true);
-          setTimeout(() => navigate("/profile"), 5000);
+          navigate("/admin");
         }
       }
     });

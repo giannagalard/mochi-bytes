@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { FormControl, TextField, Button, Snackbar, Alert } from "@mui/material";
 import { AddRecipe } from "../firebase/firebase";
+import { alpha } from "@mui/material/styles";
 
 export default function Add() {
   const [name, setName] = useState("");
@@ -9,13 +10,14 @@ export default function Add() {
   const [cookTime, setCookTime] = useState(0);
   const [prepTime, setPrepTime] = useState(0);
   const [ingredients, setIngredients] = useState("");
-  const [directions, setDirections] = useState("");
   const [category, setCategory] = useState("");
   const [protein, setProtein] = useState("");
   const [notes, setNotes] = useState("");
+  const [directionsCount, setDirectionsCount] = useState(1);
 
   const [successful, setSuccessful] = useState(false);
   const [error, setError] = useState(false);
+  const [directions, setDirections] = useState([""]);
 
   const SubmitData = async () => {
     const strCookTime = `${cookTime}min`;
@@ -34,7 +36,7 @@ export default function Add() {
           totalTime: strTotalTime,
         },
         ingredients: ingredients.split(",").map((ing) => ing.trim()),
-        directions: directions.split(",").map((dir) => dir.trim()),
+        directions,
         category: category.split(",").map((cat) => cat.trim()),
         notes: notes.length ? notes.split(",").map((note) => note.trim()) : [],
       },
@@ -46,6 +48,34 @@ export default function Add() {
       setError(true);
     }
   };
+
+  const handleDirections = (e, i) => {
+    let newDirections = [...directions];
+    newDirections[i] = e.target.value;
+    setDirections(newDirections);
+  };
+
+  const handleRemoveDirections = () => {
+    let newDirections = [...directions];
+    newDirections.splice(directionsCount - 1, 1);
+    setDirections(newDirections);
+    setDirectionsCount(directionsCount - 1);
+  };
+
+  const directionsEl = [];
+
+  for (let i = 0; i < directionsCount; i++) {
+    directionsEl.push(
+      <TextField
+        key={i}
+        id="filled-multiline-static"
+        label="Direction"
+        placeholder="Enter direction"
+        onChange={(e) => handleDirections(e, i)}
+        variant="filled"
+      />
+    );
+  }
 
   const handleClose = (event, reason) => {
     if (reason === "clickaway") {
@@ -142,15 +172,21 @@ export default function Add() {
           rows={4}
           variant="filled"
         />
-        <TextField
-          id="filled-multiline-static"
-          label="Directions"
-          placeholder="Enter directions in comma separated list"
-          onChange={(e) => setDirections(e.target.value)}
-          multiline
-          rows={4}
-          variant="filled"
-        />
+        {directionsEl}
+        <Button
+          onClick={() => {
+            setDirectionsCount(directionsCount + 1);
+            setDirections([...directions, ""]);
+          }}
+        >
+          Add Direction
+        </Button>
+        <Button
+          disabled={directionsCount === 1}
+          onClick={handleRemoveDirections}
+        >
+          Remove Direction
+        </Button>
         <TextField
           id="filled-multiline-static"
           label="Notes*"
@@ -161,7 +197,17 @@ export default function Add() {
           variant="filled"
         />
       </FormControl>
-      <Button onClick={SubmitData} variant="contained">
+      <Button
+        sx={{
+          background: alpha("#FF7892", 0.6),
+          "&:hover": {
+            backgroundColor: alpha("#FF7892", 0.8),
+          },
+          fontFamily: "'Acme', sans-serif",
+        }}
+        onClick={SubmitData}
+        variant="contained"
+      >
         Add
       </Button>
       {successful && (

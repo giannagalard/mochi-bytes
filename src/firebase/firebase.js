@@ -9,11 +9,12 @@ import {
     getDocs,
     getDoc,
     addDoc,
+    deleteDoc,
     doc,
     limit,
-    orderBy,
     where,
-    query
+    query,
+    orderBy
 } from "firebase/firestore";
 
 import {
@@ -49,9 +50,21 @@ export async function loginWithGoogle() {
         });
 }
 
-export async function fetchRecipes() {
+export async function fetchLatestRecipes() {
     const data = []
-    const querySnapshot = await getDocs(collection(db, "recipes"));
+    const querySnapshot = await getDocs(query(collection(db, "recipes"), limit(5)));
+    querySnapshot.forEach((doc) => {
+        // doc.data() is never undefined for query doc snapshots
+        let arr = doc.data()
+        arr.data.id = doc.id
+        data.push(arr);
+    });
+    return data;
+}
+
+export async function fetchAllRecipes() {
+    const data = []
+    const querySnapshot = await getDocs(query(collection(db, "recipes"), orderBy('data.name'), limit(10)));
     querySnapshot.forEach((doc) => {
         // doc.data() is never undefined for query doc snapshots
         let arr = doc.data()
@@ -74,6 +87,8 @@ export async function fetchRecipe(id) {
         throw e
     }
 }
+
+
 
 export async function AddRecipe(data) {
     try {
@@ -100,4 +115,16 @@ export async function searchData(search) {
     } catch (e) {
         throw e
     }
+}
+
+export async function deleteRecipe(id) {
+    try {
+        await deleteDoc(doc(db, 'recipes', id))
+    } catch (e) {
+        throw e
+    }
+}
+
+export async function signOut() {
+    await auth.signOut();
 }

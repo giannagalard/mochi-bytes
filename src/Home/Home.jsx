@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { Typography, Box } from "@mui/material";
-import { fetchRecipes } from "../firebase/firebase";
+import { fetchLatestRecipes } from "../firebase/firebase";
 import { Loading } from "../components";
 import { MemoizedRecipesCards } from "../components";
 import { Link } from "react-router-dom";
 
 function Home() {
-  const [recipes, setRecipes] = useState([]);
+  const [latestRecipes, setLatestRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setLoading(true);
     (async () => {
       try {
-        await fetchRecipes().then((result) => setRecipes(result));
+        await fetchLatestRecipes().then((result) => setLatestRecipes(result));
         setLoading(false);
       } catch (e) {
         setLoading(false);
@@ -42,7 +42,7 @@ function Home() {
       >
         Latest Recipes {">"}
       </Typography>
-      <MemoizedRecipesCards recipes={recipes.slice(0, 5)} page="home" />
+      <MemoizedRecipesCards recipes={latestRecipes} page="home" />
     </Box>
   );
 }
