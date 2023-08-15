@@ -9,7 +9,7 @@ import Home from './Home';
 import Recipe from './Recipe';
 import Recipes from './Recipes';
 import { Navbar } from './components';
-import { Login, Admin } from "./Admin"
+import { Login, Admin, Edit } from "./Admin"
 import NotFound from "./NotFound"
 import Search from './Search';
 
@@ -38,6 +38,11 @@ const router = createBrowserRouter([
       {
         path: "/recipe/:recipeId",
         element: <Recipe />,
+        errorElement: <NotFound />
+      },
+      {
+        path: "/edit/:recipeId",
+        element: <Edit />,
         errorElement: <NotFound />
       },
       {

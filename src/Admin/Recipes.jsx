@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import {
   deleteRecipe,
   fetchAllRecipes,
+  lastPage,
   nextPage,
   previousPage,
 } from "../firebase/firebase";
@@ -23,6 +24,7 @@ import LastPageIcon from "@mui/icons-material/LastPage";
 import { Box } from "@mui/material";
 
 import { Snackbar, Alert } from "@mui/material";
+import { Link } from "react-router-dom";
 
 export default function Recipes() {
   const [loading, setLoading] = useState(true);
@@ -55,16 +57,33 @@ export default function Recipes() {
     setLoading(true);
     (async () => {
       try {
-        if (dir === "+")
-          await nextPage(rows[rows.length - 1].id).then((result) => {
+        if (dir === "+") {
+          await nextPage(rows[rows.length - 1].name).then((result) => {
             setRows(
               result.map((recipe) => {
                 return { name: recipe.data.name, id: recipe.data.id };
               })
             );
           });
-        else if (dir === "-") {
-          await previousPage(rows[0].id).then((result) => {
+        } else if (dir === "-") {
+          await previousPage(rows[0].name).then((result) => {
+            setRows(
+              result.map((recipe) => {
+                return { name: recipe.data.name, id: recipe.data.id };
+              })
+            );
+          });
+        } else if (dir === "++") {
+          await lastPage().then((result) => {
+            setRows(
+              result.map((recipe) => {
+                return { name: recipe.data.name, id: recipe.data.id };
+              })
+            );
+          });
+        } else if (dir === "--") {
+          await fetchAllRecipes().then((result) => {
+            console.log(result);
             setRows(
               result.map((recipe) => {
                 return { name: recipe.data.name, id: recipe.data.id };
@@ -99,6 +118,16 @@ export default function Recipes() {
     setDir("-");
   };
 
+  const handleLast = () => {
+    setPage();
+    setDir("++");
+  };
+
+  const handleFirst = () => {
+    setPage(0);
+    setDir("--");
+  };
+
   const handleDelete = (id) => {
     try {
       deleteRecipe(id);
@@ -117,27 +146,29 @@ export default function Recipes() {
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 500 }} aria-label="custom pagination table">
         <TableBody>
-          {rows.slice(0, rows.length).map((row, ind) => (
-            <TableRow key={row.name}>
-              <TableCell component="th" scope="row">
-                {row.name}
-              </TableCell>
-              <TableCell component="th" scope="row">
-                <IconButton>
-                  <Edit />
-                </IconButton>
-                <IconButton onClick={() => handleDelete(row.id)}>
-                  <Remove />
-                </IconButton>
-              </TableCell>
-            </TableRow>
-          ))}
+          {rows
+            .slice(0, rows.length === 11 ? rows.length - 1 : rows.length)
+            .map((row, ind) => (
+              <TableRow key={row.name}>
+                <TableCell component="th" scope="row">
+                  {row.name}
+                </TableCell>
+                <TableCell component="th" scope="row">
+                  <IconButton LinkComponent={Link} to={`/edit/${row.id}`}>
+                    <Edit />
+                  </IconButton>
+                  <IconButton onClick={() => handleDelete(row.id)}>
+                    <Remove />
+                  </IconButton>
+                </TableCell>
+              </TableRow>
+            ))}
         </TableBody>
         <TableFooter>
           <TableRow>
             <Box sx={{ flexShrink: 0, ml: 2.5 }}>
               <IconButton
-                onClick={() => {}}
+                onClick={handleFirst}
                 disabled={page === 0}
                 aria-label="first page"
               >
@@ -169,7 +200,7 @@ export default function Recipes() {
                   <KeyboardArrowRight />
                 )}
               </IconButton>
-              <IconButton onClick={() => {}} aria-label="last page">
+              <IconButton onClick={handleLast} aria-label="last page">
                 {theme.direction === "rtl" ? (
                   <FirstPageIcon />
                 ) : (

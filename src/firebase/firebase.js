@@ -18,6 +18,7 @@ import {
     orderBy,
     startAt,
     endAt,
+    updateDoc,
 } from "firebase/firestore";
 
 import {
@@ -98,13 +99,15 @@ export async function fetchRecipe(id) {
 export async function nextPage(lastRecipe) {
     try {
         let data = []
-        const querySnapshot = await getDocs(query(collection(db, "recipes"), orderBy('id'), limit(11), startAt(lastRecipe)));
+        console.log(lastRecipe)
+        const querySnapshot = await getDocs(query(collection(db, "recipes"), orderBy('data.name'), startAt(lastRecipe), limit(11)));
         querySnapshot.forEach((doc) => {
             // doc.data() is never undefined for query doc snapshots
             let arr = doc.data()
             arr.data.id = doc.id
             data.push(arr);
         });
+        console.log(data)
         return data;
     } catch (e) {
         throw e
@@ -114,7 +117,7 @@ export async function nextPage(lastRecipe) {
 export async function previousPage(lastRecipe) {
     try {
         let data = []
-        const querySnapshot = await getDocs(query(collection(db, "recipes"), orderBy('id'), limitToLast(11), endAt(lastRecipe)));
+        const querySnapshot = await getDocs(query(collection(db, "recipes"), orderBy('data.name'), limitToLast(11), endAt(lastRecipe)));
         querySnapshot.forEach((doc) => {
             // doc.data() is never undefined for query doc snapshots
             let arr = doc.data()
@@ -136,10 +139,20 @@ export async function AddRecipe(data) {
     }
 }
 
+export async function UpdateRecipe(data, id) {
+    try {
+
+        await updateDoc(doc(db, 'recipes', id), data)
+        return true
+    } catch (e) {
+        throw e
+    }
+}
+
 export async function lastPage() {
     try {
         let data = []
-        const querySnapshot = await getDocs(query(collection(db, "recipes"), limitToLast(10)));
+        const querySnapshot = await getDocs(query(collection(db, "recipes"), orderBy('data.name'), limitToLast(11)));
         querySnapshot.forEach((doc) => {
             // doc.data() is never undefined for query doc snapshots
             let arr = doc.data()

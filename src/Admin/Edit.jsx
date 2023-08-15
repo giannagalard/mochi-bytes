@@ -1,9 +1,16 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FormControl, TextField, Button, Snackbar, Alert } from "@mui/material";
-import { AddRecipe } from "../firebase/firebase";
+import { UpdateRecipe, fetchRecipe } from "../firebase/firebase";
 import { alpha } from "@mui/material/styles";
+import { useParams } from "react-router-dom";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../firebase/firebase";
+import { useNavigate } from "react-router-dom";
 
 export default function Add() {
+  let { recipeId } = useParams();
+  const navigate = useNavigate();
+
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [imgUrl, setImgUrl] = useState("");
@@ -19,6 +26,49 @@ export default function Add() {
   const [error, setError] = useState(false);
   const [directions, setDirections] = useState([""]);
 
+  const [loading, setLoading] = useState([""]);
+
+  useEffect(() => {
+    let isMounted = true;
+    onAuthStateChanged(auth, (user) => {
+      if (!user || !user.email === process.env.REACT_APP_EMAIL) {
+        if (isMounted) {
+          navigate("/home");
+        }
+      }
+    });
+    return () => {
+      isMounted = false;
+    };
+  }, [navigate]);
+
+  useEffect(() => {
+    setLoading(true);
+    (async () => {
+      try {
+        await fetchRecipe(recipeId).then((result) => {
+          const r = result.data;
+          console.log(r);
+          setCategory(r.category.join(","));
+          setCookTime(parseInt(r.details.cookTime));
+          setDescription(r.description);
+          setDirections(r.directions);
+          setIngredients(r.ingredients.join(","));
+          setName(r.name);
+          setImgUrl(r.image);
+          setNotes(r.notes.join(","));
+          setPrepTime(parseInt(r.details.prepTime));
+          setProtein(r.protein);
+          setDirectionsCount(directions.length);
+        });
+        setLoading(false);
+      } catch (e) {
+        setLoading(false);
+        setError(true);
+      }
+    })();
+  }, [recipeId, directions.length]);
+
   const SubmitData = async () => {
     const strCookTime = `${cookTime}min`;
     const strPrepTime = `${prepTime}min`;
@@ -30,7 +80,6 @@ export default function Add() {
         description,
         protein,
         image: imgUrl,
-        
         details: {
           cookTime: strCookTime,
           prepTime: strPrepTime,
@@ -44,8 +93,14 @@ export default function Add() {
     };
 
     try {
-      await AddRecipe(data).then((result) => setSuccessful(true));
+      await UpdateRecipe(data, recipeId).then((result) => {
+        setSuccessful(true);
+        setTimeout(() => {
+          navigate("/admin");
+        }, 500);
+      });
     } catch (e) {
+      console.log(e);
       setError(true);
     }
   };
@@ -71,6 +126,7 @@ export default function Add() {
         key={i}
         id="filled-multiline-static"
         label="Direction"
+        value={directions[i]}
         placeholder="Enter direction"
         onChange={(e) => handleDirections(e, i)}
         variant="filled"
@@ -101,12 +157,14 @@ export default function Add() {
           id="filled-basic"
           onChange={(e) => setName(e.target.value)}
           label="Name"
+          value={name}
           variant="filled"
         />
         <TextField
           id="filled-basic"
           onChange={(e) => setProtein(e.target.value)}
           label="Protein"
+          value={protein}
           variant="filled"
         />
       </FormControl>
@@ -119,6 +177,7 @@ export default function Add() {
           id="filled-basic"
           onChange={(e) => setImgUrl(e.target.value)}
           label="Image URL"
+          value={imgUrl}
           variant="filled"
         />
         <TextField
@@ -126,6 +185,7 @@ export default function Add() {
           label="Description"
           onChange={(e) => setDescription(e.target.value)}
           multiline
+          value={description}
           rows={4}
           variant="filled"
         />
@@ -141,12 +201,14 @@ export default function Add() {
           id="filled-basic"
           onChange={(e) => setCookTime(e.target.value)}
           label="Cook Time"
+          value={cookTime}
           variant="filled"
         />
         <TextField
           id="filled-basic"
           onChange={(e) => setPrepTime(e.target.value)}
           label="Prep Time"
+          value={prepTime}
           variant="filled"
         />
       </FormControl>
@@ -161,6 +223,7 @@ export default function Add() {
           placeholder="Enter category in comma separated list"
           onChange={(e) => setCategory(e.target.value)}
           multiline
+          value={category}
           rows={4}
           variant="filled"
         />
@@ -170,6 +233,7 @@ export default function Add() {
           placeholder="Enter ingredients in comma separated list"
           onChange={(e) => setIngredients(e.target.value)}
           multiline
+          value={ingredients}
           rows={4}
           variant="filled"
         />
@@ -194,6 +258,7 @@ export default function Add() {
           placeholder="Enter notes in comma separated list"
           onChange={(e) => setNotes(e.target.value)}
           multiline
+          value={notes}
           rows={4}
           variant="filled"
         />
@@ -209,21 +274,21 @@ export default function Add() {
         onClick={SubmitData}
         variant="contained"
       >
-        Add
+        Update
       </Button>
       {successful && (
         <Snackbar
           open={successful}
           autoHideDuration={6000}
           onClose={handleClose}
-          message="Recipe has been created!"
+          message="Recipe has been updated!"
         >
           <Alert
             onClose={handleClose}
             severity="success"
             sx={{ width: "100%" }}
           >
-            Recipe has been created!
+            Recipe has been updated!
           </Alert>
         </Snackbar>
       )}
