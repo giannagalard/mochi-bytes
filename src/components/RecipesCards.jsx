@@ -10,17 +10,35 @@ export default function RecipesCards(props) {
   const { recipes, page } = props;
   return (
     <Grid
-      sx={{ display: "flex", mt: 2, gap: { xs: "20px", sm: "0" } }}
+      sx={{
+        display: "flex",
+        gap: {
+          xs: "20px",
+          sm: page === "recipesPage" && "10px",
+          md: page === "recipesPage" && "20px",
+          lg: page === "recipesPage" && "30px",
+        },
+        background: page === "recipesPage" && "#FFDAE1",
+        height: page === "recipesPage" && "100%",
+        borderRadius: page === "recipesPage" && "10px",
+        boxSizing: "border-box",
+        p: page === "recipesPage" && 1,
+        justifyContent: { xs: "center", md: "flex-start" },
+      }}
       container
     >
       {recipes?.map((recipe, ind) => {
-        const r = recipe.data;
+        const r = recipe?.data;
         return (
           <Grid key={ind} item xs={5} sm={2} md={2}>
-            <Link to={`/recipe/${r.id}`}>
+            <Link to={`/recipe/${r?.id}`}>
               <Image
                 sx={{
-                  width: { xs: "100%", sm: "90%", md: "90%" },
+                  width: {
+                    xs: "100%",
+                    sm: page === "recipesPage" ? "100%" : "90%",
+                    md: page === "recipesPage" ? "100%" : "90%",
+                  },
                   height: {
                     xs: "13rem",
                     sm: "9rem",
@@ -28,15 +46,15 @@ export default function RecipesCards(props) {
                     lg: "15rem",
                   },
                 }}
-                src={r.image}
-                alt={r.name}
+                src={r?.image}
+                alt={r?.name}
                 target="_blank"
               />
             </Link>
           </Grid>
         );
       })}
-      {page && (
+      {page === "recipes" && (
         <Grid
           sx={{
             background: "#FFDAE1",
@@ -58,10 +76,16 @@ export default function RecipesCards(props) {
               alignItems: "center",
             }}
           >
-            <Typography sx={{ color: "#FF7892" }}>View More</Typography>
+            <Typography sx={{ color: "#FF7892" }}>View All</Typography>
           </Link>
         </Grid>
       )}
+      {recipes?.length === 0 && (
+        <Typography variant="h4" sx={{ p: 1 }}>
+          No Recipes Found
+        </Typography>
+      )}
+      {props.pagination}
     </Grid>
   );
 }

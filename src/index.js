@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
 import {
   createBrowserRouter,
@@ -12,8 +12,22 @@ import { Navbar } from './components';
 import { Login, Admin, Edit } from "./Admin"
 import NotFound from "./NotFound"
 import Search from './Search';
+import './index.css'
+
+import { getCount } from './firebase/firebase';
 
 const NavbarWrapper = () => {
+  useEffect(() => {
+    (async () => {
+      try {
+        if (!localStorage.getItem("count")) {
+          await getCount().then((result) => localStorage.setItem("count", result));
+        }
+      } catch (e) {
+      }
+    })();
+  }, [])
+
   return (
     <div>
       <Navbar />
@@ -71,6 +85,7 @@ const router = createBrowserRouter([
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
+
   <React.StrictMode>
     <RouterProvider router={router} />
   </React.StrictMode>

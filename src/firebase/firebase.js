@@ -19,6 +19,7 @@ import {
     startAt,
     endAt,
     updateDoc,
+    getCountFromServer,
 } from "firebase/firestore";
 
 import {
@@ -66,18 +67,24 @@ export async function fetchLatestRecipes() {
     return data;
 }
 
-export async function fetchAllRecipes() {
+export async function fetchAllRecipes(cats) {
     try {
         const data = []
-        const querySnapshot = await getDocs(query(collection(db, "recipes"), orderBy('data.name'), limit(11)));
+        let querySnapshot;
+        console.log(cats)
+        if (cats.length !== 0) {
+            querySnapshot = await getDocs(query(collection(db, "recipes"), where("data.category", "array-contains-any", cats), orderBy('data.name'), limit(11)));
+        } else {
+            querySnapshot = await getDocs(query(collection(db, "recipes"), orderBy('data.name'), limit(11)));
+        }
         querySnapshot.forEach((doc) => {
-            // doc.data() is never undefined for query doc snapshots
             let arr = doc.data()
             arr.data.id = doc.id
             data.push(arr);
         });
         return data;
     } catch (e) {
+        console.log(e)
         throw e
     }
 }
@@ -141,9 +148,18 @@ export async function AddRecipe(data) {
 
 export async function UpdateRecipe(data, id) {
     try {
-
         await updateDoc(doc(db, 'recipes', id), data)
         return true
+    } catch (e) {
+        throw e
+    }
+}
+
+export async function getCount() {
+    try {
+        const coll = collection(db, "recipes");
+        const snapshot = await getCountFromServer(coll);
+        return snapshot.data().count
     } catch (e) {
         throw e
     }
@@ -152,13 +168,14 @@ export async function UpdateRecipe(data, id) {
 export async function lastPage() {
     try {
         let data = []
-        const querySnapshot = await getDocs(query(collection(db, "recipes"), orderBy('data.name'), limitToLast(11)));
+        const limit = localStorage.getItem("count") % 10
+        const querySnapshot = await getDocs(query(collection(db, "recipes"), orderBy('data.name'), limitToLast(limit)));
         querySnapshot.forEach((doc) => {
-            // doc.data() is never undefined for query doc snapshots
             let arr = doc.data()
             arr.data.id = doc.id
             data.push(arr);
         });
+        console.log(data)
         return data;
     } catch (e) {
         throw e

@@ -31,9 +31,10 @@ export default function Recipes() {
   const [rows, setRows] = useState([]);
   const [error, setError] = useState(false);
   const [successful, setSuccessful] = useState(false);
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(1);
   const [dir, setDir] = useState("");
   const theme = useTheme();
+  const [pages, setPages] = useState(localStorage.getItem("count"));
 
   useEffect(() => {
     setLoading(true);
@@ -119,12 +120,12 @@ export default function Recipes() {
   };
 
   const handleLast = () => {
-    setPage();
+    setPage(Math.ceil(pages / 10));
     setDir("++");
   };
 
   const handleFirst = () => {
-    setPage(0);
+    setPage(1);
     setDir("--");
   };
 
@@ -169,7 +170,7 @@ export default function Recipes() {
             <Box sx={{ flexShrink: 0, ml: 2.5 }}>
               <IconButton
                 onClick={handleFirst}
-                disabled={page === 0}
+                disabled={page === 1}
                 aria-label="first page"
               >
                 {theme.direction === "rtl" ? (
@@ -180,7 +181,7 @@ export default function Recipes() {
               </IconButton>
               <IconButton
                 onClick={handlePrev}
-                disabled={page === 0}
+                disabled={page === 1}
                 aria-label="previous page"
               >
                 {theme.direction === "rtl" ? (

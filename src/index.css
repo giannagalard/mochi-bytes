@@ -1,0 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Acme&display=swap');
+
+html, body {
+    font-family: 'Acme', sans-serif;
+}
+
+@font-face {
+    font-family: 'Acme';
+    src: url(https://fonts.googleapis.com/css2?family=Acme&display=swap) format('truetype');
+  }
