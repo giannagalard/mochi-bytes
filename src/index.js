@@ -5,7 +5,6 @@ import {
   RouterProvider,
   Outlet
 } from "react-router-dom";
-import Home from './Home';
 import Recipe from './Recipe';
 import Recipes from './Recipes';
 import { Navbar } from './components';
@@ -43,11 +42,7 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <Home />,
-      },
-      {
-        path: "/home",
-        element: <Home />,
+        element: <Recipes />,
       },
       {
         path: "/recipe/:recipeId",

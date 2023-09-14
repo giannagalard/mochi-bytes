@@ -81,7 +81,7 @@ export default function Navbar() {
           >
             <Avatar
               component={Link}
-              to="/home"
+              to="/recipes"
               src={logo}
               variant="rounded"
               sx={{
