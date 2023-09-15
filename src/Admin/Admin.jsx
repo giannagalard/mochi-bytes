@@ -1,4 +1,4 @@
-import React, { useEffect} from "react";
+import React, { useEffect } from "react";
 import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
@@ -21,7 +21,7 @@ export default function Admin() {
     onAuthStateChanged(auth, (user) => {
       if (!user || !user.email === process.env.REACT_APP_EMAIL) {
         if (isMounted) {
-          navigate("/home");
+          navigate("/");
         }
       }
     });

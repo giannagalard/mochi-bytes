@@ -37,7 +37,7 @@ export default function Login() {
   useEffect(() => {
     let isMounted = true;
     onAuthStateChanged(auth, (user) => {
-      if (!user) {
+      if (user) {
         if (isMounted) {
           setLoading(true);
           navigate("/admin");
