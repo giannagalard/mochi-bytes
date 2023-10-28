@@ -56,20 +56,14 @@ export default function Filter(props) {
     >
       <Box
         sx={{
-          height: "75%",
+          height: "85%",
           width: "90%",
           p: 0,
         }}
       >
-        <Typography
-          sx={{ textDecoration: "underline", color: "#f72585" }}
-          variant="h6"
-        >
-          Filter Categories
-        </Typography>
         <Box
           sx={{
-            mt: 3,
+            mt: 1,
             height: "100%",
             width: "100%",
             overflowY: "scroll",

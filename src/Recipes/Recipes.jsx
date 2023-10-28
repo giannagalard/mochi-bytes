@@ -48,8 +48,8 @@ export default function Recipes() {
       try {
         await fetchAllRecipes(categories).then((result) => {
           setRows(result.slice(0, 10));
+          setLoading(false);
         });
-        setLoading(false);
       } catch (e) {
         setLoading(false);
       }
@@ -64,22 +64,25 @@ export default function Recipes() {
           await nextPage(rows[rows.length - 1].name, categories).then(
             (result) => {
               setRows(result.slice(0, 10));
+              setLoading(false);
             }
           );
         } else if (dir === "-") {
           await previousPage(rows[0].name, categories).then((result) => {
             setRows(result.slice(0, 10));
+            setLoading(false);
           });
         } else if (dir === "++") {
           await lastPage(categories).then((result) => {
             setRows(result.slice(0, 10));
+            setLoading(false);
           });
         } else if (dir === "--") {
           await fetchAllRecipes(categories).then((result) => {
             setRows(result.slice(0, 10));
+            setLoading(false);
           });
         }
-        setLoading(false);
       } catch (e) {
         setLoading(false);
       }
@@ -186,6 +189,7 @@ export default function Recipes() {
         md={10}
       >
         <MemoizedRecipesCards
+          loading={loading}
           pagination={pagination}
           recipes={rows}
           page="recipesPage"

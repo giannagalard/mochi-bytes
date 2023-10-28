@@ -1,9 +1,26 @@
 import React, { useState, useEffect } from "react";
 import { fetchRecipe } from "../firebase/firebase";
-import { Typography, Box, Chip, Stack } from "@mui/material";
+import {
+  FormGroup,
+  Box,
+  FormControlLabel,
+  Stack,
+  Grid,
+  Checkbox,
+  Typography,
+} from "@mui/material";
 import { Loading } from "../components";
 import { useParams } from "react-router-dom";
 import NotFound from "../NotFound/NotFound";
+import { styled } from "@mui/material/styles";
+
+const Item = styled(Box)(({ theme }) => ({
+  backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
+  ...theme.typography.body2,
+  paddingLeft: theme.spacing(1),
+  color: theme.palette.text.secondary,
+  flexGrow: 1,
+}));
 
 export default function Recipe() {
   let { recipeId } = useParams();
@@ -15,8 +32,10 @@ export default function Recipe() {
     setLoading(true);
     (async () => {
       try {
-        await fetchRecipe(recipeId).then((result) => setRecipe(result.data));
-        setLoading(false);
+        await fetchRecipe(recipeId).then((result) => {
+          setRecipe(result.data);
+          setLoading(false);
+        });
       } catch (e) {
         setLoading(false);
         setError(true);
@@ -28,128 +47,110 @@ export default function Recipe() {
     <Loading />
   ) : !error ? (
     <Box sx={{ m: 3, "& > :not(styled)": { mb: 4 } }}>
-      <Stack direction="row" spacing={1}>
-        {recipe?.category?.map((cat) => {
-          return <Chip label={cat} variant="outlined" />;
-        })}
-      </Stack>
-      <Box>
-        <Typography
-          sx={{ textDecoration: "underline", textDecorationColor: "#D5BDAF" }}
-          variant="h2"
+      <Grid container>
+        <Grid
+          sx={{ backgroundColor: "#FFDAE1", borderRadius: "10px" }}
+          item
+          xs={12}
+          sm={6}
+          md={3}
+          order={{ xs: "2", md: "1" }}
+          p={1}
         >
-          {recipe?.name}
-        </Typography>
-        <Typography variant="body1">{recipe?.description}</Typography>
-      </Box>
-      <Stack direction="row" spacing={4}>
-        <Stack>
-          <Typography
-            sx={{
-              textDecoration: "underline",
-              textDecorationColor: "#D5BDAF",
-              fontWeight: "bold",
-            }}
-            variant="body1"
+          <Stack
+            spacing={{ xs: 1, sm: 2 }}
+            direction="row"
+            useFlexGap
+            flexWrap="wrap"
+            textAlign="left"
           >
-            Cook Time
-          </Typography>
-          <Typography variant="body2">{recipe?.details?.cookTime}</Typography>
-        </Stack>
-        <Stack>
-          <Typography
-            sx={{
-              textDecoration: "underline",
-              textDecorationColor: "#D5BDAF",
-              fontWeight: "bold",
-            }}
-            variant="body1"
-          >
-            Prep Time
-          </Typography>
-          <Typography variant="body2">{recipe?.details?.prepTime}</Typography>
-        </Stack>
-        <Stack>
-          <Typography
-            sx={{
-              textDecoration: "underline",
-              textDecorationColor: "#D5BDAF",
-              fontWeight: "bold",
-            }}
-            variant="body1"
-          >
-            Total Time
-          </Typography>
-          <Typography variant="body2">{recipe?.details?.totalTime}</Typography>
-        </Stack>
-      </Stack>
-      <Stack direction={{ xs: "column", md: "row" }} spacing={20}>
-        <Stack>
-          <Typography
-            sx={{
-              textDecoration: "underline",
-              textDecorationColor: "#D5BDAF",
-              fontWeight: "bold",
-            }}
-            variant="h6"
-          >
-            Ingredients
-          </Typography>
-          {recipe?.ingredients?.map((ing) => {
-            return <Typography variant="body2">{ing}</Typography>;
-          })}
-        </Stack>
-        <Stack>
-          <Typography
-            sx={{
-              textDecoration: "underline",
-              textDecorationColor: "#D5BDAF",
-              fontWeight: "bold",
-            }}
-            variant="h6"
-          >
-            Directions
-          </Typography>
-          {recipe?.directions?.map((dir, index) => {
-            return (
-              <Stack direction="row" spacing={4} sx={{ mb: 3 }}>
-                <Typography
-                  sx={{
-                    textDecoration: "underline",
-                    textDecorationColor: "#D5BDAF",
-                    fontWeight: "bold",
-                  }}
-                  variant="body2"
-                >
-                  Step {index + 1}
-                </Typography>
-                <Typography variant="body2">{dir}</Typography>
-              </Stack>
-            );
-          })}
-        </Stack>
-      </Stack>
-      <Stack>
-        <Typography
-          sx={{
-            textDecoration: "underline",
-            textDecorationColor: "#D5BDAF",
-            fontWeight: "bold",
-          }}
-          variant="h6"
+            <FormGroup>
+              {recipe.ingredients.map((i, index) => {
+                return (
+                  <Item key={index}>
+                    <FormControlLabel control={<Checkbox />} label={i} />
+                  </Item>
+                );
+              })}
+            </FormGroup>
+          </Stack>
+        </Grid>
+        <Grid
+          sx={{ p: 1 }}
+          item
+          xs={12}
+          sm={6}
+          md={6}
+          order={{ xs: "1", md: "2" }}
         >
-          Notes:
-        </Typography>
-        {recipe?.notes?.length === 0 ? (
-          <Typography variant="body1">No notes.</Typography>
-        ) : (
+          <Grid spacing={1} container>
+            <Grid item xs={12} sm={6} md={6}>
+              <img
+                style={{
+                  aspectRatio: "1/1",
+                  width: "100%",
+                  borderRadius: "10px",
+                }}
+                src={recipe.image}
+                alt={recipe.name}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6} md={6}>
+              <Box
+                sx={{
+                  backgroundColor: "#FFDAE1",
+                  borderRadius: "10px",
+                  height: "100%",
+                }}
+              >
+                <Box p={1}>
+                  <Typography variant="h4" sx={{ color: "#FF7892" }}>
+                    {recipe.name}
+                  </Typography>
+                  <Typography>{recipe.description}</Typography>
+                </Box>
+              </Box>
+            </Grid>
+          </Grid>
+          <Grid m={1} container>
+            <Grid item xs={6}>
+              <Typography sx={{ color: "#FF7892" }} variant="h5">
+                Prep Time
+              </Typography>
+              <Typography>{recipe.details.prepTime}</Typography>
+            </Grid>
+            <Grid item xs={6}>
+              <Typography sx={{ color: "#FF7892" }} variant="h5">
+                Cook Time
+              </Typography>
+              <Typography>{recipe.details.cookTime}</Typography>
+            </Grid>
+          </Grid>
           <Box>
-            {recipe?.notes?.map((note) => {
-              return <Typography>{note}</Typography>;
-            })}
+            <Stack
+              direction="row"
+              useFlexGap
+              flexWrap="wrap"
+              textAlign="left"
+              sx={{ backgroundColor: "#FFDAE1", borderRadius: "5px" }}
+              p={1}
+            >
+              {recipe.directions.map((d, index) => {
+                return (
+                  <Item p={1} key={index}>
+                    <Typography>
+                      {index + 1}. {d}
+                    </Typography>
+                  </Item>
+                );
+              })}
+            </Stack>
           </Box>
-        )}
-      </Stack>
+        </Grid>
+        <Grid item xs={12} sm={12} md={3} order={{ xs: "3", md: "3" }}>
+          <Typography variant="h5">Similar Recipes</Typography>
+        </Grid>
+      </Grid>
     </Box>
   ) : (
     <NotFound />

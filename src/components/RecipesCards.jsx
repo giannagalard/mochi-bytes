@@ -1,13 +1,23 @@
 import React from "react";
-import { styled, Grid, Typography } from "@mui/material";
+import { styled, Grid, Typography, Skeleton, Box } from "@mui/material";
 import { Link } from "react-router-dom";
 
 const Image = styled("img")(({ theme }) => ({
   borderRadius: "10px",
 }));
 
+const skeletons = [];
+
+for (let i = 0; i < 10; i++) {
+  skeletons.push(
+    <Grid key={i} item xs={5} sm={2} md={2}>
+      <Skeleton variant="rounded" height="100%" />
+    </Grid>
+  );
+}
+
 export default function RecipesCards(props) {
-  const { recipes, page } = props;
+  const { recipes, page, loading } = props;
   return (
     <Grid
       sx={{
@@ -15,45 +25,59 @@ export default function RecipesCards(props) {
         gap: {
           xs: "20px",
           sm: page === "recipesPage" && "10px",
-          md: page === "recipesPage" && "20px",
-          lg: page === "recipesPage" && "30px",
+          md: page === "recipesPage" && "10px",
+          lg: page === "recipesPage" && "20px",
         },
         background: page === "recipesPage" && "#FFDAE1",
         height: page === "recipesPage" && "100%",
         borderRadius: page === "recipesPage" && "10px",
         boxSizing: "border-box",
         p: page === "recipesPage" && 1,
-        justifyContent: { xs: "center", md: "flex-start" },
+        justifyContent: "space-between",
       }}
       container
     >
-      {recipes?.map((recipe, ind) => {
-        const r = recipe?.data;
-        return (
-          <Grid key={ind} item xs={5} sm={2} md={2}>
-            <Link to={`/recipe/${r?.id}`}>
-              <Image
-                sx={{
-                  width: {
-                    xs: "100%",
-                    sm: page === "recipesPage" ? "100%" : "90%",
-                    md: page === "recipesPage" ? "100%" : "90%",
-                  },
-                  height: {
-                    xs: "13rem",
-                    sm: "9rem",
-                    md: "15rem",
-                    lg: "15rem",
-                  },
-                }}
-                src={r?.image}
-                alt={r?.name}
-                target="_blank"
-              />
-            </Link>
-          </Grid>
-        );
-      })}
+      {!loading
+        ? recipes?.map((recipe, ind) => {
+            const r = recipe?.data;
+            return (
+              <Grid key={ind} item xs={5} sm={2} md={2}>
+                <Link
+                  style={{ textDecoration: "none" }}
+                  to={`/recipe/${r?.id}`}
+                >
+                  <Image
+                    sx={{
+                      width: {
+                        xs: "100%",
+                        sm: page === "recipesPage" ? "100%" : "90%",
+                        md: page === "recipesPage" ? "100%" : "90%",
+                      },
+                      height: {
+                        xs: "13rem",
+                        sm: "11rem",
+                        md: "13rem",
+                        lg: "15rem",
+                      },
+                    }}
+                    src={r?.image}
+                    alt={r?.name}
+                    target="_blank"
+                  />
+                  <Box>
+                    <Typography
+                      sx={{ color: "#FF6D8F" }}
+                      textAlign="center"
+                      variant="body1"
+                    >
+                      {r?.name}
+                    </Typography>
+                  </Box>
+                </Link>
+              </Grid>
+            );
+          })
+        : skeletons}
       {page === "recipes" && (
         <Grid
           sx={{
@@ -80,7 +104,7 @@ export default function RecipesCards(props) {
           </Link>
         </Grid>
       )}
-      {recipes?.length === 0 && (
+      {!loading && recipes?.length === 0 && (
         <Typography variant="h4" sx={{ p: 1 }}>
           No Recipes Found
         </Typography>

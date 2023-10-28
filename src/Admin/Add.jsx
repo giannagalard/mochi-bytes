@@ -22,7 +22,7 @@ export default function Add() {
   const SubmitData = async () => {
     const strCookTime = `${cookTime}min`;
     const strPrepTime = `${prepTime}min`;
-    const strTotalTime = `${cookTime + prepTime}min`;
+    const strTotalTime = `${Math.number(cookTime + prepTime)}min`;
     const data = {
       data: {
         name,
@@ -30,7 +30,7 @@ export default function Add() {
         description,
         protein,
         image: imgUrl,
-        
+
         details: {
           cookTime: strCookTime,
           prepTime: strPrepTime,

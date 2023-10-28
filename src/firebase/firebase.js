@@ -71,7 +71,7 @@ export async function fetchAllRecipes(cats) {
     try {
         const data = []
         let querySnapshot;
-        if (cats.length !== 0) {
+        if (cats?.length) {
             querySnapshot = await getDocs(query(collection(db, "recipes"), where("data.category", "array-contains-any", cats), orderBy('data.name'), limit(11)));
         } else {
             querySnapshot = await getDocs(query(collection(db, "recipes"), orderBy('data.name'), limit(11)));
